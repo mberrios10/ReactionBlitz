@@ -1,0 +1,158 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="theme-color" content="#0b1020" />
+  <title>ReactionBlitz</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <main class="app-shell" id="appShell">
+    <header class="hero">
+      <div>
+        <p class="eyebrow">30-second reaction challenge</p>
+        <h1>ReactionBlitz</h1>
+        <p class="subtitle">Hit solid targets fast. Avoid striped decoys. Build a combo before the 30-second clock runs out.</p>
+      </div>
+    </header>
+
+    <fieldset id="difficultyChooser" class="difficulty-chooser">
+      <legend>Choose difficulty</legend>
+      <p class="difficulty-help">Pick a mode before the round. You can choose again after the round ends.</p>
+      <div class="difficulty-options">
+        <label class="difficulty-option">
+          <input type="radio" name="difficultyMode" value="easy" checked />
+          <span class="difficulty-option__name">Easy</span>
+          <span class="difficulty-option__detail">Large targets · longer time · fewer decoys</span>
+        </label>
+        <label class="difficulty-option">
+          <input type="radio" name="difficultyMode" value="medium" />
+          <span class="difficulty-option__name">Medium</span>
+          <span class="difficulty-option__detail">Balanced size, speed, and decoys</span>
+        </label>
+        <label class="difficulty-option">
+          <input type="radio" name="difficultyMode" value="hard" />
+          <span class="difficulty-option__name">Hard</span>
+          <span class="difficulty-option__detail">Small targets · short time · more decoys</span>
+        </label>
+      </div>
+    </fieldset>
+
+    <section class="stats" aria-label="Game statistics">
+      <div class="stat-card stat-card--primary">
+        <span class="stat-label">Time</span>
+        <strong id="timer" class="stat-value">30.0</strong>
+      </div>
+      <div class="stat-card stat-card--primary">
+        <span class="stat-label">Score</span>
+        <strong id="score" class="stat-value">0</strong>
+      </div>
+      <div class="stat-card stat-card--primary">
+        <span class="stat-label">Combo</span>
+        <strong id="combo" class="stat-value">0×</strong>
+      </div>
+      <div class="stat-card stat-card--secondary">
+        <span class="stat-label">Last reaction</span>
+        <strong id="lastReaction" class="stat-value">—</strong>
+      </div>
+      <div class="stat-card stat-card--secondary">
+        <span class="stat-label">Mode</span>
+        <strong id="difficulty" class="stat-value">Easy</strong>
+      </div>
+      <div class="stat-card stat-card--secondary">
+        <span class="stat-label">High score</span>
+        <strong id="highScore" class="stat-value">0</strong>
+      </div>
+    </section>
+
+    <section class="game-card">
+      <div class="instructions" id="instructions">
+        <div>
+          <h2>How to play</h2>
+          <div class="target-key" aria-label="Target key">
+            <span><i class="key-swatch key-swatch--target" aria-hidden="true"></i>Solid = hit</span>
+            <span><i class="key-swatch key-swatch--decoy" aria-hidden="true"></i>Striped = avoid</span>
+          </div>
+        </div>
+        <ul>
+          <li>Click, tap, or use the keyboard on each <strong>solid target</strong> as quickly as you can.</li>
+          <li>A normal target starts at <strong>100 points</strong>. Each consecutive hit adds a <strong>10-point combo bonus</strong>, up to 300 points per hit.</li>
+          <li><strong>Striped decoys</strong> cost <strong>75 points</strong> and reset your combo.</li>
+          <li><strong>Missing a target costs 0 points but resets your combo.</strong> Empty-space clicks and expired real targets count as misses.</li>
+          <li>Every mode gets harder during the round. Easy stays larger/slower; Hard stays smaller/faster.</li>
+        </ul>
+      </div>
+
+      <div class="pre-game-controls">
+        <label class="player-name-field" for="playerName">
+          <span>Player name</span>
+          <input id="playerName" name="playerName" type="text" maxlength="18" autocomplete="nickname" placeholder="Player" />
+        </label>
+        <button id="startButton" class="primary-button start-button" type="button">Start Easy Round</button>
+      </div>
+
+      <section id="playArea" class="play-area" aria-labelledby="playAreaTitle" aria-describedby="playAreaHelp">
+        <h2 id="playAreaTitle" class="sr-only">ReactionBlitz play area</h2>
+        <p id="playAreaHelp" class="sr-only">During a round, targets and decoys appear here as buttons. Keyboard players can use Enter or Space. Press Tab to leave the active game control.</p>
+        <div id="readyMessage" class="center-message">
+          <strong>Ready?</strong>
+          <span>Choose a difficulty, hit solid, avoid striped, then press Start.</span>
+        </div>
+      </section>
+
+      <p id="gameStatus" class="sr-only" aria-live="polite">Game ready. Easy difficulty selected.</p>
+    </section>
+
+    <section id="results" class="results" hidden aria-labelledby="resultsTitle">
+      <div>
+        <p class="eyebrow">Round complete</p>
+        <h2 id="resultsTitle" tabindex="-1">Your Results</h2>
+        <p id="highScoreMessage" class="high-score-message" hidden>New High Score!</p>
+        <p id="leaderboardMessage" class="leaderboard-message" hidden></p>
+      </div>
+      <div class="result-grid">
+        <div><span>Final score</span><strong id="finalScore">0</strong></div>
+        <div><span>Best reaction</span><strong id="bestReaction">—</strong></div>
+        <div><span>Average reaction</span><strong id="averageReaction">—</strong></div>
+        <div><span>Targets hit</span><strong id="targetsHit">0</strong></div>
+        <div><span>Best combo</span><strong id="bestCombo">0×</strong></div>
+        <div><span>Accuracy</span><strong id="accuracy">0%</strong></div>
+        <div><span>Misses</span><strong id="misses">0</strong></div>
+        <div><span>Decoys clicked</span><strong id="decoysClicked">0</strong></div>
+        <div><span>Performance</span><strong id="performanceRating">D</strong></div>
+      </div>
+      <button id="restartButton" class="primary-button" type="button">Restart</button>
+    </section>
+
+    <section id="leaderboard" class="leaderboard" aria-labelledby="leaderboardTitle">
+      <div class="leaderboard-heading">
+        <div>
+          <p class="eyebrow">Saved on this browser</p>
+          <h2 id="leaderboardTitle">All-Time Top 25</h2>
+        </div>
+        <p class="leaderboard-note">Scores are stored locally on this device. Mode is shown because difficulty affects target size, speed, and decoy rate.</p>
+      </div>
+      <div class="leaderboard-table-wrap">
+        <table class="leaderboard-table">
+          <thead>
+            <tr>
+              <th scope="col">#</th>
+              <th scope="col">Player</th>
+              <th scope="col">Score</th>
+              <th scope="col">Mode</th>
+              <th scope="col">Date</th>
+            </tr>
+          </thead>
+          <tbody id="leaderboardBody">
+            <tr class="leaderboard-empty"><td colspan="5">No scores yet. Finish a round to set the first score.</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+  </main>
+
+  <script src="game-core.js"></script>
+  <script src="script.js"></script>
+</body>
+</html>
