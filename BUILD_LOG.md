@@ -1,157 +1,80 @@
-# ReactionBlitz Build Log
+# ReactionBlitz — AI / Build Log
 
-Use this file to document the project as a sequence of small AI-assisted changes. Record only work that actually happened. **Human verification fields are intentionally blank and must be completed by you after you personally test the game.**
+This log records the major prompts, revisions, and verification that actually occurred while building ReactionBlitz. It does not invent unfamiliar-user observations or unperformed human tests.
 
-Copy the entry template for each meaningful revision rather than pasting one giant prompt.
+## 1. Core playable loop
 
-## Entry template
+**Prompt / goal:** Build and refine a small browser reaction game with a clear Ready → Start → Gameplay → Results → Restart loop.
 
-### Change
+**Changes made:** Implemented a 30-second round, moving targets, score, combo, reaction-time tracking, end-of-round results, and a working restart flow using vanilla HTML, CSS, and JavaScript.
 
-What I wanted to improve:
+**Verification:** Automated browser tests exercise starting, playing, ending, viewing results, and restarting. Repeated Start/Restart input during an active round is ignored to prevent duplicate rounds.
 
-> _Fill in._
+## 2. Scoring and miss behavior
 
-### Agent instruction
+**Prompt / goal:** Make normal misses cost 0 points. Empty-space clicks and expired real targets should count as misses, reset the combo, and leave the score unchanged. Decoys should remain a penalty.
 
-Concise summary of what I asked the AI agent to do:
+**Changes made:** Real targets begin at 100 points with a +10 combo bonus per consecutive hit, capped at a 200-point bonus. Normal misses subtract 0 points and reset the combo. Clicking a striped decoy subtracts 75 points and resets the combo. Immediate feedback shows hit points, combo feedback, MISS, or −75 DECOY.
 
-> _Fill in._
+**Verification:** Automated tests check a normal hit, combo scoring, an empty-space miss, an expired target, a decoy penalty, duplicate activation protection, and score locking after the round ends.
 
-### Inspection/diagnosis
+## 3. Accessibility, input, and reliability
 
-What issue was found by inspection or testing:
+**Prompt / goal:** Make the game usable with mouse, touch, and keyboard; improve focus behavior and accessibility; prevent timer/input race conditions.
 
-> _Fill in only with findings that actually occurred._
+**Changes made:** Targets and decoys are native buttons. Enter and Space work for keyboard play. Keyboard-started rounds allow focus to follow new targets, while pointer play does not steal focus. Real targets are circular/solid and decoys are square/striped so the distinction is not color-only. Screen-reader announcements are limited to useful countdown and round-status messages. Reduced-motion preferences are respected. Stale target timers, duplicate clicks, re-entrant starts, and visibility/resume edge cases are guarded.
 
-### Implementation
+**Verification:** Automated browser tests cover keyboard, mouse, touch, focus behavior, resizing/orientation containment, reduced race conditions, and blocked/malformed storage behavior.
 
-What files or logic changed:
+## 4. Results, high scores, and persistence
 
-> _Fill in with the actual revision._
+**Prompt / goal:** Improve the results screen and retain useful player progress.
 
-### Human verification
+**Changes made:** Results include final score, best reaction, average reaction, targets hit, best combo, accuracy, misses, decoys clicked, and a performance rating. High scores persist in localStorage with validation and safe fallback behavior if storage is unavailable.
 
-What I personally tested:
+**Verification:** Tests check result focus, accuracy calculations, rating rules, persistence shape, malformed storage rejection, and blocked-storage fallback.
 
-> _Complete this yourself after testing._
+## 5. Easy / Medium / Hard difficulty modes
 
-### Result
+**Prompt / goal:** Add player-selectable Easy, Medium, and Hard modes, with Easy substantially easier and the differences obvious.
 
-Did the change work? What did I adjust afterward?
+**Changes made:** Added a native radio difficulty chooser. Easy uses larger, slower targets and fewer decoys; Medium is the baseline; Hard uses smaller, faster targets and more decoys. Each mode still ramps within the 30-second round. High scores are stored separately by mode.
 
-> _Complete this yourself._
+**Current presets:**
+- **Easy:** 96→76 px targets, 2000→1350 ms lifetime, about 10% decoys.
+- **Medium:** 76→50 px targets, 1250→650 ms lifetime, about 22% decoys.
+- **Hard:** 60→44 px targets, 850→360 ms lifetime, about 35% decoys.
 
----
+**Verification:** Automated tests confirm all three starting sizes/lifetimes, obvious mode differences, mode locking during play, mode changes after results, and per-mode high-score behavior.
 
-## Suggested incremental entries to document
+## 6. Start placement and Top-25 leaderboard
 
-These are **prompts/placeholders, not claims that you personally completed the tests**.
+**Prompt / goal:** Move Start directly above the play area so the player does not have to scroll after pressing it, and add a Top-25 all-time leaderboard.
 
-### Entry: Core playable loop
+**Human feedback that led to the change:** The project owner explicitly reported the Start-button friction: they did not want to scroll down after pressing Start.
 
-**Change:** Ready → Start → Gameplay → Results → Restart flow.
+**Changes made:** Moved the player-name field and Start button directly above the play area and automatically position the play area in view when a round begins. Added a Top-25 leaderboard showing player, score, difficulty, and date. Scores are sorted highest-first and saved locally on the current browser/device.
 
-**Agent instruction:** _Summarize the request that produced or repaired the core loop._
+**Important scope note:** The leaderboard is local to the browser/device because the project is a static site with no shared writable backend.
 
-**Inspection/diagnosis:** _Record the actual issue found._
+**Verification:** Automated responsive tests check Start placement, play-area positioning, leaderboard ordering/truncation, persistence, player-name sanitization, and the empty-state fallback.
 
-**Implementation:** _Record the actual files/logic changed._
+## 7. Rename from Reflex Rush to ReactionBlitz
 
-**Human verification:** _Personally run several full rounds and restarts; record what happened._
+**Prompt / goal:** Rename the finished game to ReactionBlitz and provide all updated outputs.
 
-**Result:** _Fill in._
+**Changes made:** Updated visible branding, document titles, JavaScript namespace, test filenames/paths, README, and storage keys. Added migration reads for the previous Reflex Rush player-name, leaderboard, and high-score keys so existing data can carry forward in the same browser.
 
-### Entry: Scoring and combo rules
+**Verification:** The full Node/browser test suite passed after the rename, including a migration check for the old storage keys.
 
-**Change:** Target points, combo bonus/cap, zero-point misses, and decoy penalty.
+## 8. GitHub publishing and public deployment
 
-**Agent instruction:** _Summarize the scoring request._
+**Prompt / goal:** Upload the complete project to GitHub and make the playable game publicly accessible.
 
-**Inspection/diagnosis:** _Record the actual scoring inconsistency or bug, if any._
+**Changes made:** Published the full source to `mberrios10/ReactionBlitz`, merged the finished project into `main`, added a GitHub Pages Actions workflow, and enabled public deployment.
 
-**Implementation:** _Record the actual files/logic changed._
+**Verification:** GitHub Actions completed the Pages deployment successfully. Public game URL: `https://mberrios10.github.io/ReactionBlitz/`.
 
-**Human verification:** _Check a first hit, several combo hits, an empty-space miss, an expired target, and a decoy._
+## Human verification status
 
-**Result:** _Fill in._
-
-### Entry: Accessibility and input modes
-
-**Change:** Keyboard, mouse, touch, focus behavior, and screen-reader status announcements.
-
-**Agent instruction:** _Summarize the accessibility request._
-
-**Inspection/diagnosis:** _Record the actual issue found._
-
-**Implementation:** _Record the actual files/logic changed._
-
-**Human verification:** _Play using keyboard only, then mouse only, then touch on a phone if available._
-
-**Result:** _Fill in._
-
-### Entry: Results, high score, and persistence
-
-**Change:** Result calculations, rating, accuracy, and local high score.
-
-**Agent instruction:** _Summarize the results/persistence request._
-
-**Inspection/diagnosis:** _Record the actual issue found._
-
-**Implementation:** _Record the actual files/logic changed._
-
-**Human verification:** _Check result values manually and reload the page to verify the high score persists._
-
-**Result:** _Fill in._
-
-### Entry: Unfamiliar-user revision
-
-**Change:** Revision made after a genuine silent user test.
-
-**Agent instruction:** _Only fill this after you have real observations from `USER_TEST.md`._
-
-**Inspection/diagnosis:** _Describe the most consequential observed friction._
-
-**Implementation:** _Describe the revision made in response._
-
-**Human verification:** _Run a second genuine attempt and record the behavior._
-
-**Result:** _Fill in._
-
-### Entry: Player-selectable difficulty
-
-**Change:** Add distinct Easy, Medium, and Hard modes without changing the 30-second scoring loop.
-
-**Agent instruction:** _Summarize the request to add player-selectable difficulty and make Easy substantially easier._
-
-**Inspection/diagnosis:** _Record what you observed about the previous single difficulty/progression system._
-
-**Implementation:** _Record the actual mode differences (target size, lifetime, decoy rate), selector UI, and per-mode high-score behavior._
-
-**Human verification:** _Personally play at least one full round on Easy, Medium, and Hard. Confirm Easy feels clearly more forgiving and Hard clearly more demanding._
-
-**Result:** _Fill in after your own test._
-
-
-### Entry: Start placement and Top-25 leaderboard
-
-**Change:** Place Start directly above the play area and add an all-time Top-25 score table for the current browser/device.
-
-**Agent instruction:** _Summarize the request to keep the play area in view after Start and add a leaderboard that updates when a score qualifies._
-
-**Inspection/diagnosis:** _Record whether the previous Start placement caused scrolling/friction and what leaderboard persistence existed before this change._
-
-**Implementation:** _Record the relocated Start control, automatic play-area positioning, player-name field, local Top-25 sorting/persistence, mode/date columns, and storage fallback._
-
-**Human verification:** _Personally play enough rounds to confirm new scores appear in the correct order, reload the page to confirm persistence, and test Start on both desktop and phone._
-
-**Result:** _Fill in after your own test._
-
-## Rename to ReactionBlitz
-
-- **Change:** Renamed the project from Reflex Rush to ReactionBlitz.
-- **Agent instruction:** Rename the game and provide the complete updated outputs.
-- **Inspection/diagnosis:** Used the latest saved ZIP as the source of truth so difficulty modes, zero-point misses, Start positioning, and the local Top-25 leaderboard were preserved.
-- **Implementation:** Updated visible branding, the JavaScript core namespace, test names/paths, documentation, and storage keys. Added migration reads for the previous Reflex Rush high-score, leaderboard, and player-name keys so existing browser data can carry forward.
-- **Human verification:** _Not yet recorded._
-- **Result:** _Automated verification is recorded separately when run; human verification remains for the project owner._
+The development record includes genuine project-owner feedback about the Start-button scrolling friction, but no separate unfamiliar-user test observation has been supplied yet. Before submission, the owner should open the public URL while signed out, complete one full round, confirm results and Restart, and run one short silent test with a person unfamiliar with the game. Those observations belong in `USER_TEST.md`; they should not be invented.
